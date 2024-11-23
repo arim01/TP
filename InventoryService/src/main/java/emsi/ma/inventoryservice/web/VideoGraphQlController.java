@@ -4,7 +4,13 @@ import emsi.ma.inventoryservice.Entities.Creator;
 import emsi.ma.inventoryservice.Entities.Video;
 import emsi.ma.inventoryservice.Repository.CreatorRepository;
 import emsi.ma.inventoryservice.Repository.VideoRepository;
+import emsi.ma.inventoryservice.dto.CreatorRequest;
+import emsi.ma.inventoryservice.dto.VideoRequest;
+import emsi.ma.inventoryservice.service.CreatorServiceImp;
+import emsi.ma.inventoryservice.service.VideoServiceImp;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
@@ -14,15 +20,23 @@ import java.util.List;
 public class VideoGraphQlController {
     private CreatorRepository creatorRepository;
     private VideoRepository videoRepository;
+
+    @Autowired
+    private CreatorServiceImp creatorService;
+
+    @Autowired
+    private VideoServiceImp videoService;
+
+
     VideoGraphQlController(CreatorRepository creatorRepository, VideoRepository videoRepository){
         this.creatorRepository = creatorRepository;
         this.videoRepository = videoRepository;
     }
     @QueryMapping
-    public List<Video> videoList(){
+    public List<VideoRequest> videoList(){
         //return videoRepository.findAll();
-        List<Video> videos = videoRepository.findAll();
-        System.out.println(videos.toString());
+        //List<Video> videos = videoRepository.findAll();
+        //System.out.println(videos.toString());
 
         // Parcourir et afficher chaque vidéo
         /*for (Video video : videos) {
@@ -35,12 +49,27 @@ public class VideoGraphQlController {
             System.out.println("-------------------------------");
         }*/
 
-        return videos;
+        //return videos;
+
+        return videoService.listVideo();
     }
     @QueryMapping
-    public Creator creatorById(@Argument Long id) {
-        return creatorRepository.findById(id)
-                .orElseThrow(()->new RuntimeException(String.format("Creator %s not found",id)));
+    public CreatorRequest creatorById(@Argument Long id) {
+        /*return creatorRepository.findById(id)
+                .orElseThrow(()->new RuntimeException(String.format("Creator %s not found",id))); */
+        return creatorService.findCreatorbyId(id);
+    }
+
+    @MutationMapping
+    public CreatorRequest saveCreator(@Argument CreatorRequest creator){
+
+        //return creatorRepository.save(creator) ;
+        return creatorService.saveCreator(creator);
+    }
+    @MutationMapping
+    public VideoRequest saveVideo(@Argument VideoRequest video){
+        //return videoRepository.save(video) ;
+        return videoService.saveVideo(video);
     }
 
 
